@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30104.148
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "P2P", "P2P_Client\P2P.csproj", "{BCDE3629-161C-4798-BBC3-94FCE92FC7D7}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{41C10F2A-D4BA-4ADF-9D2A-1A704033FC51}"
+	ProjectSection(SolutionItems) = preProject
+		Test.txt = Test.txt
+		Utilities.cs = Utilities.cs
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{BCDE3629-161C-4798-BBC3-94FCE92FC7D7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BCDE3629-161C-4798-BBC3-94FCE92FC7D7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BCDE3629-161C-4798-BBC3-94FCE92FC7D7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BCDE3629-161C-4798-BBC3-94FCE92FC7D7}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {97F9F9BB-6EED-4016-914B-07D4F7D6DADF}
+	EndGlobalSection
+EndGlobal
