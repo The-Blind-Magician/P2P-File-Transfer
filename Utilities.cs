@@ -56,7 +56,7 @@ namespace P2P_Utilities
 			client = new TcpClient();			
 			Console.Write("Establishing connection... ");
 			await client.ConnectAsync(IPAddress, 80);
-			Console.Write("Connected to source server\n");
+			Console.Write("Connected to source server\n\n");
 		}
 		public async Task InitClient()
         {
@@ -69,22 +69,28 @@ namespace P2P_Utilities
 		{
 			clientStream = client.GetStream();
 			byte[] byteArr = new byte[BUFFER_SIZE];
-			long bytesDownloaded = 0;
-			long chunks = 0;
-			while (bytesDownloaded < fileSize)
+			byte[] result;
+			long bytesReceived = 0;
+			do
 			{
-				Console.WriteLine("Awaiting stream read");
-				await clientStream.ReadAsync(byteArr, 0, byteArr.Length);
-				Console.WriteLine("Awaiting write)");
-				await clientStream.WriteAsync(Encoding.Default.GetBytes($"Success{chunks += 1}"));
-				yield return byteArr;
-			}
+				//Console.WriteLine("Awaiting stream read");
+				int length = await clientStream.ReadAsync(byteArr, 0, byteArr.Length);
+				bytesReceived += length;
+
+				result = byteArr[0..(length-1)];
+
+				await clientStream.WriteAsync(Encoding.Default.GetBytes($"Success"));
+				//Console.WriteLine("Awaiting write)");
+				yield return result;
+			} while (bytesReceived < fileSize);
+			Console.WriteLine($"packet only {result.Length}");
 		}
 
 		public async Task<byte[]> RecieveInitData()
 		{
 			clientStream = client.GetStream();
 			byte[] byteArr = new byte[BUFFER_SIZE];
+			for(int i = 0; i < BUFFER_SIZE; i++) { byteArr[i] = BitConverter.GetBytes(' ').First(); }
 			await clientStream.ReadAsync(byteArr, 0, byteArr.Length);
 			await clientStream.WriteAsync(Encoding.Default.GetBytes($"Success"));
 			return byteArr;
@@ -93,12 +99,13 @@ namespace P2P_Utilities
 		public async IAsyncEnumerable<long> SendData(string path)
         {
 			long bytesSent = 0;
-			byte[] tempArr = new byte[1024];
+			byte[] tempArr = new byte[BUFFER_SIZE];
 			await foreach (var result in ChunkData(path))
 			{
-				Console.WriteLine("Awaiting send data");
+				//Console.WriteLine("\nAwaiting send data");
+				//Console.WriteLine(Encoding.Default.GetString(result));
 				await serverSocket.SendAsync(result,SocketFlags.None);// TODO: do not send and recieve empty packets
-				Console.WriteLine("Awaiting recieve");
+				//Console.WriteLine("Awaiting recieve");
 				var res = await serverSocket.ReceiveAsync(tempArr, SocketFlags.None);
 				yield return (bytesSent += result.Length);
 			}
@@ -106,28 +113,29 @@ namespace P2P_Utilities
 		public async Task SendData(byte[] byteArr)
 		{
 			byte[] tempArr = new byte[20];
-			Console.WriteLine("Awaiting send data 1");
+			//Console.WriteLine("\nAwaiting send data 1");
 			await serverSocket.SendAsync(byteArr, SocketFlags.None);
-			Console.WriteLine(Encoding.Default.GetString(byteArr).Trim());
-			Console.WriteLine("Awaiting recieve 1");
+			Console.WriteLine($"\n\"{Encoding.Default.GetString(byteArr).Trim()}\"");
+			//Console.WriteLine("Awaiting recieve 1");
 			await serverSocket.ReceiveAsync(tempArr, SocketFlags.None);
-			tempArr = tempArr.Where(x => BitConverter.ToString(x) != "32"); //read byte space
-			Console.WriteLine(Encoding.ASCII.GetString(tempArr).Trim());
+			//tempArr = (byte[])tempArr.Where(x => BitConverter.ToString(new byte[] { x }) != "32"); //read byte space
+			Console.WriteLine(Encoding.ASCII.GetString(tempArr).Trim()+"\n");
 		}
 
 		public async IAsyncEnumerable<byte[]> ChunkData(string path)
 		{
-			var stream = new FileStream(path, FileMode.Open, FileAccess.Read);
-			using (var file = new BinaryReader(stream))
+			var stream = new MemoryStream();
+			byte[] buffer = new byte[BUFFER_SIZE];
+			long bytesRead = 0;
+			do
 			{
-				long totalBytes = stream.Length;
-				byte[] tempData = new byte[BUFFER_SIZE];
-				do
-				{
-					tempData = file.ReadBytes(BUFFER_SIZE);
-					yield return tempData;
-				} while (tempData.Length > 0);
-			}
+				int length = await stream.ReadAsync(buffer, (int)bytesRead, buffer.Length);
+				if (length == 0) { break; }
+				var result = buffer[0..(length-1)];
+				bytesRead += length;
+				await stream.FlushAsync();
+				yield return result;
+			} while (true);
 		}
 		public async IAsyncEnumerable<byte[]> ChunkString(string str)
 		{

@@ -7,6 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "P2P", "P2P_Client\P2P.cspro
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{41C10F2A-D4BA-4ADF-9D2A-1A704033FC51}"
 	ProjectSection(SolutionItems) = preProject
+		Range - Why Generalists Triumph in a Specialized World.pdf = Range - Why Generalists Triumph in a Specialized World.pdf
 		Test.txt = Test.txt
 		Utilities.cs = Utilities.cs
 	EndProjectSection

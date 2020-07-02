@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Runtime.CompilerServices;
@@ -15,11 +16,11 @@ namespace P2P
     class P2P
     {
         public static Utilities utils;
-        public static string testPath = @"C:\Users\chris\Documents\GitHub\P2P-File-Transfer\Test.txt";
+        public static string testPath = @"C:\Users\cholcombe\Documents\GitHub\P2P-File-Transfer\Range - Why Generalists Triumph in a Specialized World.pdf";
         [STAThread]
         static async Task Main(string[] args)
         {
-            bool MODE = args[0] == "send" ? true : false;
+            bool MODE = args[0] == "send";
             if (MODE)
             {
                 utils = new Utilities();
@@ -39,26 +40,28 @@ namespace P2P
             await utils.InitClient();
             long bytesReceived = 0;
             utils.fileName = utils.fileName.Trim();
-            string path = Path.Combine(Environment.CurrentDirectory, utils.fileName.Trim());
+            string path = Path.Combine(Environment.CurrentDirectory, utils.fileName);
 
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
-            Console.WriteLine(path);
-            if (!File.Exists(path))
-                File.Create(path);
-
-            using (FileStream fileStream = new FileStream(Path.Combine(Environment.CurrentDirectory, utils.fileName.Trim()), FileMode.Append, FileAccess.Write))
+            //Console.WriteLine(path);
+            if (!File.Exists(path)) { File.Create(path); }
+            Thread.Sleep(100);
+            using (FileStream fileStream = new FileStream(path, FileMode.Truncate, FileAccess.Write))
             {
                 await foreach (var result in utils.RecieveFileData())
                 {
-                    await fileStream.WriteAsync(result);
-                    Console.Write($"{bytesReceived += result.Length}/{utils.fileSize} bytes received");
+                    var temp = result.Where(x => x != BitConverter.GetBytes(' ').First()).ToArray();
+                    if (Encoding.Default.GetString(temp) == "stop") { Console.WriteLine($"\"{temp}\" received"); break; }
+                    await fileStream.WriteAsync(temp);
+
                     Console.CursorLeft = 0;
+                    Console.Write($"{bytesReceived += temp.Length}/{utils.fileSize} bytes received");
                     await fileStream.FlushAsync();
                 }
             }
             stopwatch.Stop();
-            Console.Write($"\nFile sucessfully downloaded in {stopwatch.Elapsed}s");
+            Console.Write($"\n\nFile sucessfully downloaded in {stopwatch.Elapsed}s"); //TODO: file contains one duplicate packet at the end
         }
 
         static async Task Server()
@@ -66,18 +69,17 @@ namespace P2P
             await utils.SetupServer();
             await utils.InitServer(testPath);
             
-            long bytesSent = 0; 
-            
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
             await foreach(var result in utils.SendData(testPath))
             {
-                bytesSent += result;
-                Console.Write($"{bytesSent}/{utils.fileSize} bytes sent");
                 Console.CursorLeft = 0;
+                Console.Write($"{result}/{utils.fileSize} bytes sent");
             }
+            Thread.Sleep(500);
+            await utils.SendData(Encoding.Default.GetBytes("stop"));
             stopwatch.Stop();
-            Console.WriteLine($"\nFile sent in {stopwatch.Elapsed}s");
+            Console.WriteLine($"\n\nFile sent in {stopwatch.Elapsed}s");
         }
     }
 }
