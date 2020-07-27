@@ -1,12 +1,9 @@
 ﻿using P2P_Utilities;
 using System;
-using System.Collections;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
-using System.Net.Sockets;
-using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -16,7 +13,9 @@ namespace P2P
     class P2P
     {
         public static Utilities utils;
-        public static string testPath = @"C:\Users\cholcombe\Documents\GitHub\P2P-File-Transfer\Range - Why Generalists Triumph in a Specialized World.pdf";
+        //public static string testPath = @"C:\Users\cholcombe\Documents\GitHub\P2P-File-Transfer\Range - Why Generalists Triumph in a Specialized World.pdf";
+        //public static string testPath = @"C:\Users\cholcombe\Documents\GitHub\P2P-File-Transfer\Test.txt";
+        public static string testPath = @"C:\Users\cholcombe\Documents\GitHub\P2P-File-Transfer\firmware-bltouch-for-z-homing.bin";
         [STAThread]
         static async Task Main(string[] args)
         {
@@ -32,7 +31,7 @@ namespace P2P
                 utils = new Utilities(IPAddress.Loopback);
                 await Client();
             }
-        }              
+        }
 
         static async Task Client()
         {
@@ -46,18 +45,18 @@ namespace P2P
             stopwatch.Start();
             //Console.WriteLine(path);
             if (!File.Exists(path)) { File.Create(path); }
-            Thread.Sleep(100);
+            while (!File.Exists(path)) { Thread.Sleep(100); }
             using (FileStream fileStream = new FileStream(path, FileMode.Truncate, FileAccess.Write))
             {
                 await foreach (var result in utils.RecieveFileData())
                 {
+                    await fileStream.FlushAsync();
                     var temp = result.Where(x => x != BitConverter.GetBytes(' ').First()).ToArray();
-                    if (Encoding.Default.GetString(temp) == "stop") { Console.WriteLine($"\"{temp}\" received"); break; }
+                    if (Encoding.Default.GetString(temp) == "stop1234") { Console.WriteLine($"\n\"{Encoding.Default.GetString(temp)}\" received"); break; }
                     await fileStream.WriteAsync(temp);
 
                     Console.CursorLeft = 0;
                     Console.Write($"{bytesReceived += temp.Length}/{utils.fileSize} bytes received");
-                    await fileStream.FlushAsync();
                 }
             }
             stopwatch.Stop();
@@ -68,16 +67,16 @@ namespace P2P
         {
             await utils.SetupServer();
             await utils.InitServer(testPath);
-            
+
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
-            await foreach(var result in utils.SendData(testPath))
+            await foreach (var result in utils.SendData(testPath))
             {
                 Console.CursorLeft = 0;
                 Console.Write($"{result}/{utils.fileSize} bytes sent");
             }
             Thread.Sleep(500);
-            await utils.SendData(Encoding.Default.GetBytes("stop"));
+            await utils.SendData(Encoding.Default.GetBytes("stop1234"));
             stopwatch.Stop();
             Console.WriteLine($"\n\nFile sent in {stopwatch.Elapsed}s");
         }
