@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "P2P": {
+      "commandName": "Project",
+      "commandLineArgs": "send"
+    }
+  }
+}

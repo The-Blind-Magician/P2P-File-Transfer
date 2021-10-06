@@ -14,8 +14,11 @@ namespace P2P
     {
         public static Utilities utils;
         //public static string testPath = @"C:\Users\cholcombe\Documents\GitHub\P2P-File-Transfer\Range - Why Generalists Triumph in a Specialized World.pdf";
-        //public static string testPath = @"C:\Users\cholcombe\Documents\GitHub\P2P-File-Transfer\Test.txt";
-        public static string testPath = @"C:\Users\cholcombe\Documents\GitHub\P2P-File-Transfer\firmware-bltouch-for-z-homing.bin";
+        //public static string testPath = @"C:\Users\cholcombe\Documents\GitHub\P2P-File-Transfer\Test Small.txt";
+        //public static string testPath = @"C:\Users\chris\Documents\GitHub\P2P-File-Transfer\Test Small.txt";        
+        //public static string testPath = @"C:\Users\chris\Documents\GitHub\P2P-File-Transfer\P2P_Client\bin\Debug\netcoreapp3.1\Test Small.txt";
+        //public static string testPath = @"C:\Users\chris\Documents\GitHub\P2P-File-Transfer\firmware-bltouch-for-z-homing.bin";
+        public static string testPath = @"C:\Users\chris\Documents\GitHub\P2P-File-Transfer\Test.txt";
         [STAThread]
         static async Task Main(string[] args)
         {

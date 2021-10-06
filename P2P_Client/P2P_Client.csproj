@@ -1,0 +1,13 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="..\Shared Files\Utilities.cs" Link="Utilities.cs" />
+    <Compile Include="..\Shared Files\P2P.cs" Link="P2P.cs" />
+  </ItemGroup>
+
+</Project>

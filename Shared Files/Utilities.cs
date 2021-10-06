@@ -38,7 +38,6 @@ namespace P2P_Utilities
             serverListener.Start();
 
             serverSocket = await serverListener.AcceptSocketAsync();
-            //serverSocket = await serverListener.AcceptSocketAsync();
             Console.Write("Connected to destination client\n");
         }
         public async Task InitServer(string file)
