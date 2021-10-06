@@ -16,10 +16,9 @@ namespace P2P
         //public static string testPath = @"C:\Users\cholcombe\Documents\GitHub\P2P-File-Transfer\Range - Why Generalists Triumph in a Specialized World.pdf";
         //public static string testPath = @"C:\Users\cholcombe\Documents\GitHub\P2P-File-Transfer\Test Small.txt";
         //public static string testPath = @"C:\Users\chris\Documents\GitHub\P2P-File-Transfer\Test Small.txt";        
-        //public static string testPath = @"..\..\..\..\Shared Files\firmware-bltouch-for-z-homing.bin";
-        //public static string testPath = @"..\..\..\..\Shared Files\P2P.txt";
-        public static string testPath = @"..\..\..\..\Shared Files\Test.txt";
-        //public static string testPath = @"..\..\..\..\Shared Files\Test Small.txt";
+        //public static string testPath = @"C:\Users\chris\Documents\GitHub\P2P-File-Transfer\P2P_Client\bin\Debug\netcoreapp3.1\Test Small.txt";
+        //public static string testPath = @"C:\Users\chris\Documents\GitHub\P2P-File-Transfer\firmware-bltouch-for-z-homing.bin";
+        public static string testPath = @"..\..\..\..\Shared Files\P2P.cs";
         [STAThread]
         static async Task Main(string[] args)
         {
@@ -47,14 +46,15 @@ namespace P2P
 
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
-            if (!File.Exists(path)) { File.Create(path).Close(); }
+            //Console.WriteLine(path);
+            if (!File.Exists(path)) { File.Create(path); }
+            while (!File.Exists(path)) { Thread.Sleep(100); }
             using (FileStream fileStream = new FileStream(path, FileMode.Truncate, FileAccess.Write))
             {
                 await foreach (var result in utils.RecieveFileData())
                 {
                     await fileStream.FlushAsync();
-                    //var temp = result.Where(x => x != BitConverter.GetBytes(' ').First()).ToArray();
-                    var temp = result.ToArray();
+                    var temp = result.Where(x => x != BitConverter.GetBytes(' ').First()).ToArray();
                     if (Encoding.Default.GetString(temp) == "stop1234") { Console.WriteLine($"\n\"{Encoding.Default.GetString(temp)}\" received"); break; }
                     await fileStream.WriteAsync(temp);
 

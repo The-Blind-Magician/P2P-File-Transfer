@@ -12,6 +12,7 @@ namespace P2P_Utilities
     public class Utilities
     {
         public IPAddress IPAddress;
+        public int Port;
 
         public TcpListener serverListener;
         public Socket serverSocket;
@@ -23,7 +24,11 @@ namespace P2P_Utilities
 
         public long fileSize = 0;
         public string fileName = "";
-        public Utilities() { }
+        public Utilities() 
+        {
+            IPAddress = IPAddress.Parse(GetLocalIP());
+            Port = 8001;
+        }
         public Utilities(IPAddress ip)
         {
             IPAddress = ip;
@@ -34,7 +39,7 @@ namespace P2P_Utilities
             //serverListener = new TcpListener(IPAddress.Parse("127.0.0.1"), 5001);
             //serverListener.Start();
             Console.Write("Establishing connection... ");
-            serverListener = new TcpListener(IPAddress.Loopback, 80);
+            serverListener = new TcpListener(IPAddress, Port);
             serverListener.Start();
 
             serverSocket = await serverListener.AcceptSocketAsync();
@@ -52,7 +57,7 @@ namespace P2P_Utilities
         {
             client = new TcpClient();
             Console.Write("Establishing connection... ");
-            await client.ConnectAsync(IPAddress, 80);
+            await client.ConnectAsync(IPAddress, Port);
             Console.Write("Connected to source server\n\n");
         }
         public async Task InitClient()
@@ -132,7 +137,7 @@ namespace P2P_Utilities
                 } while (true);
             }
         }
-        public async IAsyncEnumerable<byte[]> ChunkString(string str)
+        public async IAsyncEnumerable<byte[]> ChunkString(string str) //Depreciated
         {
             //while (true)
             //{
@@ -147,14 +152,22 @@ namespace P2P_Utilities
                     extraBytes = dataBytes.Length - dataChunks * BUFFER_SIZE;
                     if (extraBytes == 0) break; //Break if no extra bytes
                 }
-                int endPoint = dataChunks > 0 ? (BUFFER_SIZE * (i != dataChunks ? (i + 1) : i)) : 0;
+                //If chunks > 0, if i != chunks, set endpoint to (i+1)*BUFFER_SIZE, else set it to i*BUFFER_SIZE + extraBytes
+                int endPoint = dataChunks > 0 ? (BUFFER_SIZE * (i != dataChunks ? (i + 1) : i)) + extraBytes : 0;
                 int frontPoint = i == 0 ? 0 : (BUFFER_SIZE * i);
 
-                tempData = dataBytes[frontPoint..(endPoint + extraBytes)]; //Assign tempData to range
+                tempData = dataBytes[frontPoint..endPoint]; //Assign tempData to range
 
                 yield return tempData;
             }
             //}
+        }
+        public string GetLocalIP()
+        {
+            string strHostName = System.Net.Dns.GetHostName();
+            IPHostEntry ipEntry = System.Net.Dns.GetHostEntry(strHostName);
+            IPAddress[] addr = ipEntry.AddressList;
+            return addr[addr.Length - 1].ToString();
         }
     }
 }
