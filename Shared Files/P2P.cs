@@ -12,10 +12,7 @@ namespace P2P
 {
     class P2P
     {
-        public static Utilities utils;
-        //public static string testPath = @"C:\Users\cholcombe\Documents\GitHub\P2P-File-Transfer\Range - Why Generalists Triumph in a Specialized World.pdf";
-        //public static string testPath = @"C:\Users\cholcombe\Documents\GitHub\P2P-File-Transfer\Test Small.txt";
-        //public static string testPath = @"C:\Users\chris\Documents\GitHub\P2P-File-Transfer\Test Small.txt";        
+        public static Utilities utils;        
         //public static string testPath = @"..\..\..\..\Shared Files\firmware-bltouch-for-z-homing.bin";
         //public static string testPath = @"..\..\..\..\Shared Files\P2P.txt";
         public static string testPath = @"..\..\..\..\Shared Files\Test.txt";
